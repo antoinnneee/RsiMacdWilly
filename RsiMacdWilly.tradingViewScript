@@ -97,16 +97,16 @@ plot(willyOut2+100, title="EMA", color=color.red)
 macdScaleLen = input(title="macd scale len", type=input.integer, defval=120)
 
 offset = 60
-macdSize = input(title="macd scale len", type=input.integer, defval=50)
+macdSize = input(title="macd size", type=input.integer, defval=50)
 hmacd = highest(hist, macdScaleLen)
 lmacd = lowest(hist, macdScaleLen)
 coef =  macdSize / hmacd[1]
-abs = hmacd[1] * coef
+abs = (hmacd[1] - lmacd[1])/2  * coef
 //plot( abs, color=color.purple, transp=0, linewidth=3)
 //plot(macdSize - offset, color = color.gray, transp=0, linewidth=2)
 
 
-plot((hist * coef) - offset, histbase=-offset, color=barColor, style=plot.style_histogram, linewidth=5)
+plot((hist * coef) - offset, histbase=0-offset, color=barColor, style=plot.style_histogram, linewidth=5)
 
 plot(macd * coef - offset, title="MACD", color=color.blue, transp=0)
 plot(signal * coef - offset, title="Signal", color=color.red, transp=0)
