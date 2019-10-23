@@ -97,7 +97,7 @@ plot(willyOut2+100, title="EMA", color=color.red)
 macdScaleLen = input(title="macd scale len", type=input.integer, defval=120)
 
 offset = 60
-macdSize = 60
+macdSize = input(title="macd scale len", type=input.integer, defval=50)
 hmacd = highest(hist, macdScaleLen)
 lmacd = lowest(hist, macdScaleLen)
 coef =  macdSize / hmacd[1]
