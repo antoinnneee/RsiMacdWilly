@@ -1,5 +1,5 @@
 //@version=4
-study("RsiWillyMACD")
+study("RsiWillyMACD", scale=scale.right)
 
 rsiob = input(title="RSI Overbought Level:", type=input.integer, defval=80)
 rsios = input(title="RSI Oversold Level:", type=input.integer, defval=20)
@@ -56,7 +56,6 @@ sma_signal = input(title="Simple MA(Signal Line)", type=input.bool, defval=false
 
 
 
-offset = 50
 
 // Calculating
 fast_ma = sma_source ? sma(msrc, fast_length) : ema(msrc, fast_length)
@@ -94,12 +93,20 @@ plot(willyOut2+100, title="EMA", color=color.red)
 
 
 //MACD PLOT
+offset = 50
+macdSize = 50
+hmacd = highest(hist, 200)
+lmacd = lowest(hist, 200)
+coef =  macdSize / hmacd[1]
+abs = hmacd[1] * coef
+//plot( abs, color=color.purple, transp=0, linewidth=3)
+//plot(macdSize - offset, color = color.gray, transp=0, linewidth=2)
 
 
-plot(hist - offset, histbase=-offset, color=barColor, style=plot.style_histogram, linewidth=5)
+plot((hist * coef) - offset, histbase=-offset, color=barColor, style=plot.style_histogram, linewidth=5)
 
-plot(macd - offset, title="MACD", color=color.blue, transp=0)
-plot(signal - offset, title="Signal", color=color.red, transp=0)
+plot(macd * coef - offset, title="MACD", color=color.blue, transp=0)
+plot(signal * coef - offset, title="Signal", color=color.red, transp=0)
 
 
 
