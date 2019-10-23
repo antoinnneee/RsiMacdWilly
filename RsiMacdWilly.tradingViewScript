@@ -1,0 +1,106 @@
+//@version=4
+study("RsiWillyMACD")
+
+rsiob = input(title="RSI Overbought Level:", type=input.integer, defval=80)
+rsios = input(title="RSI Oversold Level:", type=input.integer, defval=20)
+
+rsilen = input(title="RSI Length:", type=input.integer, defval=7)
+rsisrc = input(title="RSI Source:", type=input.source, defval=close)
+
+rsi = rsi(rsisrc, rsilen)
+
+
+
+
+// WILLY
+
+willyLength = input(21, minval=1)
+upper = highest(willyLength)
+lower = lowest(willyLength)
+willyOut = 100 * (close - upper) / (upper - lower)
+willySrc = willyOut, willLen = input(13, minval=1, title="ema willy Length")
+willyOut2 = ema(willyOut, willLen)
+
+
+
+
+//MACD
+
+hilow = ((high - low)*100)
+openclose = ((close - open)*100)
+vol = (volume / hilow)
+spreadvol = (openclose * vol)
+VPT = spreadvol + cum(spreadvol)
+window_len = 28
+
+v_len = 14
+price_spread = stdev(high-low, window_len)
+
+v =  spreadvol + cum(spreadvol)
+smooth1 = sma(v, v_len)
+v_spread = stdev(v - smooth1, window_len)
+shadow = (v - smooth1) / v_spread * price_spread
+
+mout = shadow > 0 ? high + shadow : low + shadow
+
+//plot(out, style=line,linewidth=3, color=color)
+macdLen=input(1)
+vpt=ema(mout,macdLen)
+// Getting inputs
+fast_length = input(title="Fast Length", type=input.integer, defval=12)
+slow_length = input(title="Slow Length", type=input.integer, defval=26)
+msrc = vpt
+signal_length = input(title="Signal Smoothing", type=input.integer, minval = 1, maxval = 50, defval = 9)
+sma_source = input(title="Simple MA(Oscillator)", type=input.bool, defval=false)
+sma_signal = input(title="Simple MA(Signal Line)", type=input.bool, defval=false)
+
+
+
+offset = 50
+
+// Calculating
+fast_ma = sma_source ? sma(msrc, fast_length) : ema(msrc, fast_length)
+slow_ma = sma_source ? sma(msrc, slow_length) : ema(msrc, slow_length)
+macd = fast_ma - slow_ma
+signal = sma_signal ? sma(macd, signal_length) : ema(macd, signal_length)
+hist = macd - signal
+barColor =hist >= 0 ? hist > hist[1] ? color.teal : color.lime :  hist > hist[1] ? color.orange : color.red
+
+
+// LINEPLOT
+
+hlineob = plot(rsiob, title="RSI Overbought", color=color.red, style=hline.style_dashed, transp=100)
+hlineos = plot(rsios, title="RSI Oversold", color=color.green, style=plot.style_line, transp=100)
+hline(rsiob, title="RSI Overbought", color=color.red, linestyle=hline.style_dashed)
+hline(rsios, title="RSI Oversold", color=color.green, linestyle=hline.style_dashed)
+hline((rsios+rsiob)/2,linestyle=hline.style_dashed)
+fill(hlineob, hlineos)
+
+
+
+// RSI PLOT
+
+rsiPlot = plot(rsi, title="RSI", color=#ff9800, linewidth=1, transp=0)
+//color = (emaSlowSerie < emaMidSerie) ? color.lime : #e91e63
+fill(hlineob, rsiPlot, color= (rsi[1] > rsiob[1] and rsi[0] > rsiob[0]) ? #f41b1b2F : #e91e6300)
+fill(hlineos, rsiPlot, color= (rsi[1] < rsios[1] and rsi[0] < rsios[0]) ? #1dc8242F : #1dc82400)
+
+
+
+// WILLY PLOT
+
+plot(willyOut+100, color = color.green)
+plot(willyOut2+100, title="EMA", color=color.red)
+
+
+//MACD PLOT
+
+
+plot(hist - offset, histbase=-offset, color=barColor, style=plot.style_histogram, linewidth=5)
+
+plot(macd - offset, title="MACD", color=color.blue, transp=0)
+plot(signal - offset, title="Signal", color=color.red, transp=0)
+
+
+
+
