@@ -73,7 +73,7 @@ hlineos = plot(rsios, title="RSI Oversold", color=color.green, style=plot.style_
 hline(rsiob, title="RSI Overbought", color=color.red, linestyle=hline.style_dashed)
 hline(rsios, title="RSI Oversold", color=color.green, linestyle=hline.style_dashed)
 hline((rsios+rsiob)/2,linestyle=hline.style_dashed)
-fill(hlineob, hlineos)
+fill(hlineob, hlineos, transp=98)
 
 
 
@@ -93,10 +93,13 @@ plot(willyOut2+100, title="EMA", color=color.red)
 
 
 //MACD PLOT
-offset = 50
-macdSize = 50
-hmacd = highest(hist, 200)
-lmacd = lowest(hist, 200)
+
+macdScaleLen = input(title="macd scale len", type=input.integer, defval=120)
+
+offset = 60
+macdSize = 60
+hmacd = highest(hist, macdScaleLen)
+lmacd = lowest(hist, macdScaleLen)
 coef =  macdSize / hmacd[1]
 abs = hmacd[1] * coef
 //plot( abs, color=color.purple, transp=0, linewidth=3)
